@@ -1,5 +1,4 @@
 
-
 ############################# HOW TO BUILD ///////
 cd RossNBossRESTful
 mkdir build
@@ -173,7 +172,7 @@ server {
         fastcgi_param  SERVER_PORT        $server_port;
         fastcgi_param  SERVER_NAME        $server_name;
     }
-	
+
     # Error Pages
     include /srv/.nginx/conf/error;
 
