@@ -1,0 +1,134 @@
+
+
+############################# HOW TO BUILD ///////
+cd RossNBossRESTful
+mkdir build
+cd build
+
+# CMAKE_BUILD_TYPE possible values
+#   * None
+#   * Debug
+#   * Release
+#   * RelWithDebInfo
+#   * MinSizeRel
+#   * GCCMinSizeRel
+#   * GCCMaxSpeedRel
+#   * GCCNativeMinSizeRel
+#   * GCCNativeMaxSpeedRel
+#   * ClangMinSizeRel
+#   * ClangMaxSpeedRel
+#   * ClangNativeMinSizeRel
+#   * ClangNativeMaxSpeedRel
+
+sudo cmake -DCMAKE_BUILD_TYPE=ClangNativeMaxSpeedRel -DSERVER_ROOT_DIR=/srv/rossnboss.com ../
+
+# -j<NUMBER_OF_CPU_CORES + 1>
+sudo make -j5 install
+
+# Then set the correct permissions on /srv/rossnboss.com
+############################# HOW TO BUILD ///////
+
+
+############################# SPAWN.DB CONF ///////
+{
+    "apps" :
+    [
+        {
+            "app"     :  "/srv/rossnboss.com/www/rossnboss.rest",
+            "config"  :  "/srv/rossnboss.com/etc/wt_config.xml",
+            "socket"  :  "/srv/rossnboss.com/tmp/rossnboss.com.socket",
+            "workdir" :  "/srv/rossnboss.com/www/"
+        }
+    ]
+}
+############################# SPAWN.DB CONF ///////
+
+
+############################# NGINX VHOST ///////
+server {
+    server_name  rossnboss.com;
+    rewrite ^(.*) http://www.rossnboss.com$1 permanent;
+
+    # CloudFlare
+    include /srv/.nginx/conf/cloudflare;
+}
+
+server {
+    listen  80;
+    server_name   www.rossnboss.com;
+    error_log     /srv/rossnboss.com/log/www_error_log;
+    access_log    /srv/rossnboss.com/log/www_access_log;
+
+    root           /srv/rossnboss.com/www/;
+    index          index.html;
+
+    merge_slashes on;
+
+    # RESTful web service
+    location /rossnboss.rest {
+        fastcgi_pass   unix:/srv/rossnboss.com/tmp/rossnboss.com.socket;
+
+        fastcgi_param  QUERY_STRING       $query_string;
+        fastcgi_param  REQUEST_METHOD     $request_method;
+        fastcgi_param  CONTENT_TYPE       $content_type;
+        fastcgi_param  CONTENT_LENGTH     $content_length;
+
+        if ($document_uri ~ "^/rossnboss.rest/(.*)") {
+            set $apache_path_info /$1;
+        }
+
+        fastcgi_param  SCRIPT_NAME        /rossnboss.com/www/rossnboss.rest;
+        fastcgi_param  PATH_INFO          $apache_path_info;
+        fastcgi_param  REQUEST_URI        $request_uri;
+        fastcgi_param  DOCUMENT_URI       $document_uri;
+        fastcgi_param  DOCUMENT_ROOT      $document_root;
+        fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+
+        fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+        fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;
+
+        fastcgi_param  REMOTE_ADDR        $remote_addr;
+        fastcgi_param  REMOTE_PORT        $remote_port;
+        fastcgi_param  SERVER_ADDR        $server_addr;
+        fastcgi_param  SERVER_PORT        $server_port;
+        fastcgi_param  SERVER_NAME        $server_name;
+    }
+	
+    # Error Pages
+    include /srv/.nginx/conf/error;
+
+    # CloudFlare
+    include /srv/.nginx/conf/cloudflare;
+}
+############################# NGINX VHOST ///////
+
+############################# NGINX LOCAL dotCONF ///////
+    merge_slashes on;
+
+    location ~ ^/rossnboss.com/www/rossnboss.rest(?<path_info>/.*|$) {
+        fastcgi_pass   unix:/srv/rossnboss.com/tmp/rossnboss.com.socket;
+
+        fastcgi_param  QUERY_STRING       $query_string;
+        fastcgi_param  REQUEST_METHOD     $request_method;
+        fastcgi_param  CONTENT_TYPE       $content_type;
+        fastcgi_param  CONTENT_LENGTH     $content_length;
+
+        fastcgi_param  SCRIPT_NAME        /rossnboss.com/www/rossnboss.rest;
+        fastcgi_param  PATH_INFO    	  $path_info;
+        fastcgi_param  REQUEST_URI        $request_uri;
+        fastcgi_param  DOCUMENT_URI       $document_uri;
+        fastcgi_param  DOCUMENT_ROOT      $document_root;
+        fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+
+        fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+        fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;
+
+        fastcgi_param  REMOTE_ADDR        $remote_addr;
+        fastcgi_param  REMOTE_PORT        $remote_port;
+        fastcgi_param  SERVER_ADDR        $server_addr;
+        fastcgi_param  SERVER_PORT        $server_port;
+        fastcgi_param  SERVER_NAME        $server_name;
+    }
+############################# NGINX LOCAL dotCONF ///////
+
+
