@@ -105,10 +105,7 @@ void PublicAPIResource::handleRequest(const Wt::Http::Request &request, Wt::Http
             wstring outResponse;
 
             /// Validating the token
-            if (uriTemplate == PostPlayerScoreJSON_URI_TEMPLATE
-                    || uriTemplate == PostPlayerScoreXML_URI_TEMPLATE
-                    || uriTemplate == TopScoresJSON_URI_TEMPLATE
-                    || uriTemplate == TopScoresXML_URI_TEMPLATE) {
+            if (boost::algorithm::contains(uriTemplate, L"/{TOKEN}")) {
                 if (!m_pimpl->IsValidToken(args[args.size() - 1])) {
                     if (boost::algorithm::contains(uriTemplate, L"/JSON")) {
                         throw RossNBoss::JSONException(INVALID_TOKEN_ERROR);
