@@ -310,7 +310,6 @@ void PublicAPIResource::Impl::GetTopScores(const OutputType &outputType, size_t 
 
     while(r.next()) {
         r >> name >> score;
-        LOG_ERROR(score);
         Row_t row { name, score };
         data.push_back(row);
     }
