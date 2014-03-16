@@ -7,8 +7,8 @@
 #include "xmlexception.hpp"
 
 using namespace std;
-using namespace RossNBoss;
 using namespace Wt;
+using namespace RossNBoss;
 
 XMLException::XMLException(const std::string &message) :
     Exception(message)
