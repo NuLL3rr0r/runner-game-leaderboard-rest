@@ -7,8 +7,8 @@
 #include "jsonexception.hpp"
 
 using namespace std;
-using namespace RossNBoss;
 using namespace Wt;
+using namespace RossNBoss;
 
 JSONException::JSONException(const std::string &message) :
     Exception(message)
