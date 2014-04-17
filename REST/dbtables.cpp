@@ -48,13 +48,6 @@ string DBTables::Table(const std::string &id)
     }
 }
 
-string DBTables::TableFromDate(const std::string &id, const std::string &date)
-{
-    return  (boost::format("archive__%1%__%2%")
-             % Table(id)
-             % boost::replace_all_copy(date, "/", "_")).str();
-}
-
 string DBTables::Fields(const std::string &id)
 {
     if (m_pimpl->FieldsHash.find(id) != m_pimpl->FieldsHash.end()) {

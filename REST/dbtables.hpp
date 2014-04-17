@@ -23,7 +23,6 @@ public:
 
 public:
     std::string Table(const std::string &id);
-    std::string TableFromDate(const std::string &id, const std::string &date);
     std::string Fields(const std::string &id);
 
     void SetFields(const std::string &tableId, const std::string &fields);
